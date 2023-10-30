@@ -32,7 +32,12 @@ public class DecodeString {
                 // pop the '['
                 stack.pop();
                 // pop the multiplier
-                multiplier = Integer.valueOf(stack.pop());
+                StringBuilder mulitiStr = new StringBuilder();
+                while (!stack.empty() && stack.peek().matches("[0-9]")) {
+                    mulitiStr.insert(0, stack.pop());
+                }
+                multiplier = Integer.valueOf(mulitiStr.toString());
+
                 // generate the decoded string
                 StringBuilder stringBuilder = new StringBuilder();
                 for (int j = 0; j < multiplier; j++) {
