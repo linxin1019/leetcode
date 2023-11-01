@@ -20,38 +20,25 @@ import static org.junit.Assert.assertEquals;
 public class DecodeString {
 
     public String decodeString(String s) {
-        Stack<String> strStack = new Stack<>();
-        Stack<Integer> multiplierStack = new Stack<>();
-
-        String result =  "";
-        int i = 0;
-        while (i < s.length()) {
-            if (Character.isDigit(s.charAt(i))) {
-                int count = 0;
-                while (Character.isDigit(s.charAt(i))) {
-                    count = count*10 + (s.charAt(i) - '0');
-                    i++;
-                }
-                multiplierStack.push(count);
-            } else if ('[' == s.charAt(i)) {
-                strStack.push(result);
-                result = "";
-                i++;
-            } else if (']' == s.charAt(i)) {
-                int multiplier = multiplierStack.pop();
-                StringBuilder stringBuilder = new StringBuilder(strStack.pop());
-                while (multiplier > 0) {
-                    stringBuilder.append(result);
-                    multiplier--;
-                }
-                result = stringBuilder.toString();
-                i++;
-            } else {
-                result +=s.charAt(i);
-                i++;
-            }
+        Stack<Integer> intStack = new Stack<>();
+        Stack<StringBuilder> strStack = new Stack<>();
+        StringBuilder cur = new StringBuilder();
+        int k = 0;
+        for (char ch : s.toCharArray()) {
+            if (Character.isDigit(ch)) {
+                k = k * 10 + ch - '0';
+            } else if ( ch == '[') {
+                intStack.push(k);
+                strStack.push(cur);
+                cur = new StringBuilder();
+                k = 0;
+            } else if (ch == ']') {
+                StringBuilder tmp = cur;
+                cur = strStack.pop();
+                for (k = intStack.pop(); k > 0; --k) cur.append(tmp);
+            } else cur.append(ch);
         }
-        return result;
+        return cur.toString();
     }
 
     @Test
