@@ -20,44 +20,45 @@ import static org.junit.Assert.assertEquals;
 public class DecodeString {
 
     public String decodeString(String s) {
-        int multiplier = 0;
-        Stack<String> stack = new Stack();
-        for (int i = 0; i < s.length(); i++) {
-            // indicates the block should come to an end
-            if ("]".equals(String.valueOf(s.charAt(i)))) {
-                StringBuilder temp = new StringBuilder();
-                while (!"[".equals(stack.peek())) {
-                    temp.insert(0, stack.pop());
-                }
-                // pop the '['
-                stack.pop();
-                // pop the multiplier
-                StringBuilder mulitiStr = new StringBuilder();
-                while (!stack.empty() && stack.peek().matches("[0-9]")) {
-                    mulitiStr.insert(0, stack.pop());
-                }
-                multiplier = Integer.valueOf(mulitiStr.toString());
+        Stack<String> strStack = new Stack<>();
+        Stack<Integer> multiplierStack = new Stack<>();
 
-                // generate the decoded string
-                StringBuilder stringBuilder = new StringBuilder();
-                for (int j = 0; j < multiplier; j++) {
-                    stringBuilder.append(temp);
+        String result =  "";
+        int i = 0;
+        while (i < s.length()) {
+            if (Character.isDigit(s.charAt(i))) {
+                int count = 0;
+                while (Character.isDigit(s.charAt(i))) {
+                    count = count*10 + (s.charAt(i) - '0');
+                    i++;
                 }
-                stack.push(stringBuilder.toString());
+                multiplierStack.push(count);
+            } else if ('[' == s.charAt(i)) {
+                strStack.push(result);
+                result = "";
+                i++;
+            } else if (']' == s.charAt(i)) {
+                int multiplier = multiplierStack.pop();
+                StringBuilder stringBuilder = new StringBuilder(strStack.pop());
+                while (multiplier > 0) {
+                    stringBuilder.append(result);
+                    multiplier--;
+                }
+                result = stringBuilder.toString();
+                i++;
             } else {
-                stack.push(String.valueOf(s.charAt(i)));
+                result +=s.charAt(i);
+                i++;
             }
         }
-        StringBuilder result = new StringBuilder();
-        while (!stack.empty()) {
-            result.insert(0, stack.pop());
-        }
-        return result.toString();
+        return result;
     }
 
     @Test
     public void test() {
         assertEquals("aaabcbc", decodeString("3[a]2[bc]"));
         assertEquals("accaccacc", decodeString("3[a2[c]]"));
+
+        System.out.println(('1' - '0')*10 + 10);
     }
 }
